@@ -49,8 +49,8 @@ def run_eval_part1(args):
     print(np.shape(mel_spec))
     # mel_spec is world output feat
     f0, sp, ap = np.split(mel_spec, [1, 514])
-    f0 *= 100.0
-    sp /= 1000.0
+    # f0 *= 100.0
+    # sp /= 1000.0
     f0 = np.ascontiguousarray(f0.T, dtype=np.float64)
     sp = np.ascontiguousarray(sp.T, dtype=np.float64)
     ap = np.ascontiguousarray(ap.T, dtype=np.float64)

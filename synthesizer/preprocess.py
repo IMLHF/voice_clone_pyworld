@@ -502,8 +502,8 @@ def process_utterance(wav: np.ndarray, text: str, out_dir: Path, basename: str,
     sp = sp.astype(np.float32)
     ap = ap.astype(np.float32)
     # print(f0.dtype, sp.dtype, ap.dtype, flush=True)
-    f0 /= 100.0
-    sp *= 1000.0
+    # f0 /= 100.0
+    # sp *= 1000.0
     n_frames = np.shape(f0)[0]
     f0 = np.reshape(f0, [n_frames, 1])
     # mel_spectrogram = audio.melspectrogram(wav, hparams).astype(np.float32)
