@@ -48,15 +48,23 @@ def run_eval_part1(args):
     print('[{:<10}]:'.format('text:'), text)
     print(np.shape(mel_spec))
     # mel_spec is world output feat
-    f0, sp, ap = np.split(mel_spec, [1, 514])
-    # f0 *= 100.0
-    # sp /= 1000.0
-    f0 = np.ascontiguousarray(f0.T, dtype=np.float64)
-    sp = np.ascontiguousarray(sp.T, dtype=np.float64)
-    ap = np.ascontiguousarray(ap.T, dtype=np.float64)
-    f0 = np.squeeze(f0, -1)
-    print(np.shape(f0), np.shape(sp), np.shape(ap))
-    wav = pw.synthesize(f0, sp, ap, hparams.sample_rate)
+
+    #############
+    # f0, sp, ap = np.split(mel_spec, [1, 514])
+    # # f0 *= 100.0
+    # # sp /= 1000.0
+    # f0 = np.ascontiguousarray(f0.T, dtype=np.float64)
+    # sp = np.ascontiguousarray(sp.T, dtype=np.float64)
+    # ap = np.ascontiguousarray(ap.T, dtype=np.float64)
+    # f0 = np.squeeze(f0, -1)
+    # print(np.shape(f0), np.shape(sp), np.shape(ap))
+    # wav = pw.synthesize(f0, sp, ap, hparams.sample_rate)
+    ##########
+
+    lf0 = mel_spec[:, :, 0]
+    mgc = mel_spec[:, :, 1:1 + hparams.n_mgc]
+    bap = mel_spec[:, :, 1 + hparams.n_mgc:]
+    wav = audio.synthesize(lf0, mgc, bap)
     audio.save_wav(wav, path, hparams.sample_rate)
 
 

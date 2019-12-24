@@ -110,10 +110,16 @@ hparams = HParams(
     silence_threshold=2,  # silence threshold used for sound trimming for wavenet preprocessing
 
     # Mel spectrogram
-    n_fft=800,  # Extra window size is filled with 0 paddings to match this parameter
-    hop_size=200,  # For 16000Hz, 200 = 12.5 ms (0.0125 * sample_rate)
-    win_size=800,  # For 16000Hz, 800 = 50 ms (If None, win_size = n_fft) (0.05 * sample_rate)
+    n_fft=1024,  # Extra window size is filled with 0 paddings to match this parameter
+    hop_size=256,  # For 16000Hz, 200 = 12.5 ms (0.0125 * sample_rate)
+    win_size=1024,  # For 16000Hz, 800 = 50 ms (If None, win_size = n_fft) (0.05 * sample_rate)
     sample_rate=16000,  # 16000Hz (corresponding to librispeech) (sox --i <filename>)
+
+    n_f0=1,
+    n_mgc=60,
+    n_ap=2,
+    n_bap=2,
+    mcep_alpha=0.58,  # 0.58(16k) 0.65(22050) 0.76(44100)
 
     frame_shift_ms=None,  # Can replace hop_size parameter. (Recommended: 12.5)
 

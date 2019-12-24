@@ -497,33 +497,53 @@ def process_utterance(wav: np.ndarray, text: str, out_dir: Path, basename: str,
 
     # Compute the mel spectrogram
     wav = wav.astype(np.float64)
+
+    # feature extraction
     f0, sp, ap = pw.wav2world(wav, hparams.sample_rate)
-    f0 = f0.astype(np.float32)
-    sp = sp.astype(np.float32)
-    ap = ap.astype(np.float32)
-    # print(f0.dtype, sp.dtype, ap.dtype, flush=True)
-    # f0 /= 100.0
-    # sp *= 1000.0
-    n_frames = np.shape(f0)[0]
-    f0 = np.reshape(f0, [n_frames, 1])
-    # mel_spectrogram = audio.melspectrogram(wav, hparams).astype(np.float32)
+    n_frames = len(f0)
+
+    # reduce the dimension of ap from 513 to 2
+    enc_ap = pw.code_aperiodicity(ap, hparams.sample_rate)
+
+    # feature normalization
+    lf0 = audio.f0_normalize(f0)
+    mgc = audio.sp_normalize(sp, hparams)
+    bap = audio.ap_normalize(enc_ap)
+    # print(lf0.dtype, mgc.dtype, bap.dtype, flush=True)
+    # print(np.shape(lf0), np.shape(mgc), np.shape(bap), flush=True)
+    # wav233 = audio.synthesize(lf0,mgc,bap,hparams)
+    # audio.save_wav(wav233, "/home/zhangwenbo5/worklhf/english_voice_clone/Voice_Cloning_byid_pyworld/test_wav.wav", hparams.sample_rate)
+    ######################
+
+    # f0, sp, ap = pw.wav2world(wav, hparams.sample_rate)
+    # f0 = f0.astype(np.float32)
+    # sp = sp.astype(np.float32)
+    # ap = ap.astype(np.float32)
+    # # print(f0.dtype, sp.dtype, ap.dtype, flush=True)
+    # # f0 /= 100.0
+    # # sp *= 1000.0
+    # n_frames = np.shape(f0)[0]
+    # f0 = np.reshape(f0, [n_frames, 1])
+  ###########################################
+
+    # mel_spectrogram = audio.melspectrogram(wav, hparams).astype(np.float32) # [80, frame]
     # mel_frames = mel_spectrogram.shape[1]
-    mel_spectrogram = np.concatenate((f0, sp, ap), axis=-1).T # [1+513*2, frame] , 1027
-    mel_frames = n_frames
+    lf0 = np.reshape(lf0, [n_frames, 1])
+    mel_spectrogram = np.concatenate((lf0, mgc, bap), axis=-1) # [frame, 1+60+1], 1027
 
     # Skip utterances that are too long
-    if mel_frames > hparams.max_mel_frames and hparams.clip_mels_length:
+    if n_frames > hparams.max_mel_frames and hparams.clip_mels_length:
         return None
 
     # Write the spectrogram, embed and audio to disk
-    np.save(mel_fpath, mel_spectrogram.T, allow_pickle=False)
+    np.save(mel_fpath, mel_spectrogram, allow_pickle=False)
     np.save(wav_fpath, wav, allow_pickle=False)
 
     # Return a tuple describing this training example
     embed_basename = basename
     if random_uttBasename_forSpkEmbedding is not None:
         embed_basename = random_uttBasename_forSpkEmbedding
-    return wav_fpath.name, mel_fpath.name, "embed-%s.npy" % embed_basename, len(wav), mel_frames, text
+    return wav_fpath.name, mel_fpath.name, "embed-%s.npy" % embed_basename, len(wav), n_frames, text
 
 
 def embed_utterance(fpaths, spk_num):
