@@ -3,4 +3,4 @@
 $git clone https://github.com/begeekmyfriend/pysptk.git \
 $cd pysptk \
 $git submodule update --init \
-$sudo cp build/../pysptk/*.so  ~/miniconda/.../pysptk \
+$python setup.py install
